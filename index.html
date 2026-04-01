@@ -101,38 +101,67 @@
   }
   @keyframes fade-in-out { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  /* ===== BGM PLAYER (UPGRADED) ===== */
+  /* ===== BGM PLAYER — COMPACT FLOATING ===== */
   #bgm-player {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
     z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none; /* children handle events */
+  }
+
+  /* Expanded panel — hidden by default */
+  .bgm-panel {
     background: rgba(8,8,25,0.97);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 0.75rem 1rem;
     backdrop-filter: blur(24px);
     box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.08), var(--glow-gold);
-    min-width: 220px;
-    transition: min-width 0.3s ease;
+    width: 220px;
+    pointer-events: all;
+    /* Hidden by default */
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    visibility: hidden;
   }
-  #bgm-player.collapsed { min-width: 0; }
+  #bgm-player.open .bgm-panel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+  }
 
-  .bgm-top-row {
+  .bgm-panel-top {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     margin-bottom: 0.55rem;
   }
-  .bgm-icon-btn {
-    background: none; border: none;
-    color: var(--gold); font-size: 1rem;
-    cursor: pointer; padding: 0;
-    transition: color 0.2s, transform 0.2s;
-    min-width: 24px; min-height: 24px;
-    display: flex; align-items: center; justify-content: center;
+  .bgm-wave {
+    display: flex; gap: 2px; align-items: flex-end;
+    height: 14px;
+    flex-shrink: 0;
   }
-  .bgm-icon-btn:hover { color: var(--gold-light); transform: scale(1.2); }
+  .bgm-wave span {
+    width: 3px; background: var(--gold);
+    border-radius: 2px;
+    animation: wave-bar 0.8s ease-in-out infinite;
+    color: transparent;
+    display: block;
+  }
+  .bgm-wave span:nth-child(1) { height: 5px; animation-delay: 0s; }
+  .bgm-wave span:nth-child(2) { height: 11px; animation-delay: 0.1s; }
+  .bgm-wave span:nth-child(3) { height: 7px; animation-delay: 0.2s; }
+  .bgm-wave span:nth-child(4) { height: 13px; animation-delay: 0.15s; }
+  .bgm-wave span:nth-child(5) { height: 5px; animation-delay: 0.05s; }
+  @keyframes wave-bar { 0%,100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+  .bgm-wave.paused span { animation-play-state: paused; opacity: 0.4; }
 
   .bgm-track-info { flex: 1; overflow: hidden; }
   .bgm-track-name {
@@ -150,33 +179,16 @@
     margin-top: 0.1rem;
   }
 
-  .bgm-collapse-btn {
+  .bgm-icon-btn {
     background: none; border: none;
-    color: var(--muted); font-size: 0.75rem;
-    cursor: pointer; padding: 0 0.25rem;
-    transition: color 0.2s;
-    line-height: 1;
+    color: var(--gold); font-size: 1rem;
+    cursor: pointer; padding: 0;
+    transition: color 0.2s, transform 0.2s;
+    min-width: 24px; min-height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  .bgm-collapse-btn:hover { color: var(--gold); }
-
-  .bgm-wave {
-    display: flex; gap: 2px; align-items: flex-end;
-    height: 14px;
-  }
-  .bgm-wave span {
-    width: 3px; background: var(--gold);
-    border-radius: 2px;
-    animation: wave-bar 0.8s ease-in-out infinite;
-    color: transparent;
-    display: block;
-  }
-  .bgm-wave span:nth-child(1) { height: 5px; animation-delay: 0s; }
-  .bgm-wave span:nth-child(2) { height: 11px; animation-delay: 0.1s; }
-  .bgm-wave span:nth-child(3) { height: 7px; animation-delay: 0.2s; }
-  .bgm-wave span:nth-child(4) { height: 13px; animation-delay: 0.15s; }
-  .bgm-wave span:nth-child(5) { height: 5px; animation-delay: 0.05s; }
-  @keyframes wave-bar { 0%,100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
-  .bgm-wave.paused span { animation-play-state: paused; opacity: 0.4; }
+  .bgm-icon-btn:hover { color: var(--gold-light); transform: scale(1.2); }
 
   .bgm-controls-row {
     display: flex;
@@ -193,7 +205,6 @@
     border-radius: 3px;
     outline: none;
     cursor: pointer;
-    position: relative;
   }
   .bgm-volume::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -214,12 +225,46 @@
   }
   .bgm-vol-label { font-size: 0.6rem; color: var(--muted); min-width: 2.5ch; text-align: right; }
 
-  #bgm-player.collapsed .bgm-track-info,
-  #bgm-player.collapsed .bgm-controls-row,
-  #bgm-player.collapsed .bgm-top-row { display: none; }
-  #bgm-player.collapsed { padding: 0.5rem; min-width: 0; }
-  #bgm-player.collapsed .bgm-collapsed-btn-row { display: flex; }
-  .bgm-collapsed-btn-row { display: none; align-items: center; gap: 0.5rem; }
+  /* Small floating toggle button — always visible */
+  .bgm-fab {
+    width: 42px; height: 42px;
+    background: rgba(8,8,25,0.97);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), var(--glow-gold);
+    backdrop-filter: blur(16px);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .bgm-fab:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6), var(--glow-gold);
+    transform: scale(1.08);
+  }
+  .bgm-fab-icon {
+    font-size: 1rem;
+    color: var(--gold);
+    transition: transform 0.2s;
+    line-height: 1;
+  }
+  /* Tiny animated dot on fab when playing */
+  .bgm-fab-dot {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 7px; height: 7px;
+    background: var(--teal);
+    border-radius: 50%;
+    border: 1.5px solid rgba(8,8,25,0.97);
+    animation: wave-bar 0.8s ease-in-out infinite;
+  }
+  .bgm-fab-dot.paused {
+    background: var(--muted);
+    animation: none;
+  }
 
   /* ===== NAVIGATION ===== */
   #navbar {
@@ -1400,7 +1445,6 @@
     .ali-alert-box { padding: 1.25rem 1rem 1.25rem 1.5rem; }
     .timeline { padding-left: 1.5rem; }
     .timeline-item::before { left: -1.85rem; }
-    #bgm-player { min-width: 180px; }
   }
 
   @media (max-width: 480px) {
@@ -1420,7 +1464,6 @@
     .ref-item { flex-direction: column; gap: 0.3rem; }
     .ref-num { min-width: auto; }
     .case-body { padding: 1rem; }
-    #bgm-player { min-width: 160px; padding: 0.6rem 0.8rem; }
     .ali-conclusion-banner { padding: 1.5rem 1rem; }
     .ali-meta-bar { gap: 0.75rem; }
     .img-showcase img { height: 180px; }
@@ -1449,31 +1492,34 @@
 <!-- Canvas Stars -->
 <canvas id="starfield"></canvas>
 
-<!-- BGM Player (Upgraded) -->
+<!-- ===== BGM PLAYER — Compact Floating ===== -->
 <div id="bgm-player">
-  <div class="bgm-top-row">
-    <div class="bgm-wave" id="bgmWave">
-      <span></span><span></span><span></span><span></span><span></span>
+  <!-- Expanded panel (hidden by default) -->
+  <div class="bgm-panel" id="bgmPanel">
+    <div class="bgm-panel-top">
+      <div class="bgm-wave" id="bgmWave">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="bgm-track-info">
+        <div class="bgm-track-name">Ilm-ul-Asrar BGM</div>
+        <div class="bgm-track-sub">আধ্যাত্মিক সুর · প্রেক্ষাপট সঙ্গীত</div>
+      </div>
+      <button class="bgm-icon-btn" id="bgmBtn" onclick="toggleBGM()" aria-label="Toggle music" title="Play / Pause">⏸</button>
     </div>
-    <div class="bgm-track-info">
-      <div class="bgm-track-name">Ilm-ul-Asrar BGM</div>
-      <div class="bgm-track-sub">আধ্যাত্মিক সুর · প্রেক্ষাপট সঙ্গীত</div>
+    <div class="bgm-controls-row">
+      <span class="bgm-vol-icon">🔉</span>
+      <input type="range" class="bgm-volume" id="bgmVolume" min="0" max="100" value="25"
+        oninput="setVolume(this.value)" aria-label="Volume">
+      <span class="bgm-vol-label" id="bgmVolLabel">25%</span>
     </div>
-    <button class="bgm-icon-btn" id="bgmBtn" onclick="toggleBGM()" aria-label="Toggle music" title="Play / Pause">⏸</button>
-    <button class="bgm-collapse-btn" onclick="collapseBGM()" title="Minimize">–</button>
   </div>
-  <div class="bgm-controls-row">
-    <span class="bgm-vol-icon">🔉</span>
-    <input type="range" class="bgm-volume" id="bgmVolume" min="0" max="100" value="25"
-      oninput="setVolume(this.value)" aria-label="Volume">
-    <span class="bgm-vol-label" id="bgmVolLabel">25%</span>
-  </div>
-  <!-- Collapsed state -->
-  <div class="bgm-collapsed-btn-row">
-    <button class="bgm-icon-btn" id="bgmBtnC" onclick="toggleBGM()" aria-label="Toggle music">⏸</button>
-    <button class="bgm-collapse-btn" onclick="collapseBGM()" title="Expand">+</button>
-  </div>
+  <!-- Small FAB button — always visible -->
+  <button class="bgm-fab" id="bgmFab" onclick="toggleBGMPanel()" aria-label="Toggle music player" title="সঙ্গীত">
+    <span class="bgm-fab-icon" id="bgmFabIcon">♪</span>
+    <span class="bgm-fab-dot" id="bgmFabDot"></span>
+  </button>
 </div>
+
 <audio id="bgm" loop>
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
@@ -2564,7 +2610,6 @@
         <p class="footer-desc">কালো যাদু, জিন ও অদৃশ্য জগৎ নিয়ে একটি নিরপেক্ষ গবেষণামূলক প্রকল্প।</p>
         <div class="dev-badge">
           <div class="dev-avatar">
-            <!-- Place dev.jpg in same folder for developer photo -->
             <img src="dev.jpg" alt="Abdullah Al Fahim"
               onerror="this.style.display='none'; this.parentElement.innerHTML='AF';">
           </div>
@@ -2686,46 +2731,63 @@ function toggleAccordion(btn) {
   if (!isOpen) item.classList.add('open');
 }
 
-// ===== BGM UPGRADED =====
+// ===== BGM — COMPACT FLOATING PLAYER =====
 let bgmPlaying = true;
-let bgmCollapsed = false;
+let bgmPanelOpen = false;
 
+// Toggle the expanded panel
+function toggleBGMPanel() {
+  const player = document.getElementById('bgm-player');
+  bgmPanelOpen = !bgmPanelOpen;
+  player.classList.toggle('open', bgmPanelOpen);
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+  const player = document.getElementById('bgm-player');
+  if (bgmPanelOpen && !player.contains(e.target)) {
+    bgmPanelOpen = false;
+    player.classList.remove('open');
+  }
+});
+
+// Play / Pause
 function toggleBGM() {
   const bgm = document.getElementById('bgm');
   const wave = document.getElementById('bgmWave');
+  const dot = document.getElementById('bgmFabDot');
+  const fabIcon = document.getElementById('bgmFabIcon');
   if (bgmPlaying) {
     bgm.pause();
     document.getElementById('bgmBtn').textContent = '▶';
-    if (document.getElementById('bgmBtnC')) document.getElementById('bgmBtnC').textContent = '▶';
     wave.classList.add('paused');
+    dot.classList.add('paused');
+    fabIcon.textContent = '♪';
   } else {
     bgm.play();
     document.getElementById('bgmBtn').textContent = '⏸';
-    if (document.getElementById('bgmBtnC')) document.getElementById('bgmBtnC').textContent = '⏸';
     wave.classList.remove('paused');
+    dot.classList.remove('paused');
+    fabIcon.textContent = '♫';
   }
   bgmPlaying = !bgmPlaying;
 }
 
+// Volume
 function setVolume(val) {
   const bgm = document.getElementById('bgm');
   bgm.volume = val / 100;
   document.getElementById('bgmVolLabel').textContent = val + '%';
-  // update slider fill colour
   const pct = val + '%';
   document.getElementById('bgmVolume').style.background =
     `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}, rgba(201,168,76,0.2) ${pct}, rgba(201,168,76,0.2) 100%)`;
 }
 
-function collapseBGM() {
-  const player = document.getElementById('bgm-player');
-  bgmCollapsed = !bgmCollapsed;
-  player.classList.toggle('collapsed', bgmCollapsed);
-}
-
-// Init volume slider gradient
+// Init
 window.addEventListener('DOMContentLoaded', () => {
   setVolume(25);
+  // Start with icon showing playing state
+  document.getElementById('bgmFabIcon').textContent = '♫';
 });
 
 // ===== MOBILE NAV =====
