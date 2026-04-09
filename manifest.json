@@ -1,0 +1,29 @@
+{
+  "name": "কালো যাদু, জিন ও অদৃশ্য জগৎ — গবেষণামূলক প্রজেক্ট",
+  "short_name": "কালো যাদু",
+  "description": "কালো যাদু, জিন ও অদৃশ্য জগৎ নিয়ে বিস্তারিত গবেষণামূলক প্রজেক্ট।",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "lang": "bn",
+  "dir": "ltr",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["education", "books"]
+}
